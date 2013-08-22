@@ -60,6 +60,14 @@ var ABalytics = {
             for (var j=0;j<elements.length;j++) elements[j].innerHTML = change[1];
         }
     },
+    enableElement: function() {
+        for (var i=0;i<this.changes.length;i++) {
+            var change = this.changes[i];
+            var elements = document.getElementsByClassName ? document.getElementsByClassName(change[0]) : this.getElementsByClassName(change[0]);
+
+            for (var j=0;j<elements.length;j++) elements[j].style.display = change[1];
+        }
+    },
     readCookie: function(name) {
         var nameEQ = name + "=";
         var ca = document.cookie.split(';');
@@ -77,7 +85,7 @@ var ABalytics = {
         var results = [];
 
         var element;
-        for (var i = 0; ((element = allElements[i]) != null) && (element != undefined); i++) {
+        for (var i = 0; (element = allElements[i]) != null; i++) {
             var elementClass = element.className;
             if (elementClass && elementClass.indexOf(className) != -1 && hasClassName.test(elementClass))
                 results.push(element);
