@@ -19,6 +19,8 @@
 
 var ABalytics = {
     changes: [],
+    element: [],
+    js_fns: [],
     // for each experiment, load a variant if already saved for this session, or pick a random one
     init: function(config, __gaq, start_slot) {
         if (typeof(start_slot) == 'undefined') start_slot = 1;
@@ -36,6 +38,8 @@ var ABalytics = {
 
             var variant = variants[variant_id];
 
+            var variant_type = variant.type || 'html';
+
             // ga.js changes _gaq into an object with a custom push() method but no concat,
             // so we have to push each _setCustomVar individually
             __gaq.push(['_setCustomVar',
@@ -46,8 +50,20 @@ var ABalytics = {
             ]);
             start_slot++;
 
-            for (var change in variant) {
-                if (change != 'name') this.changes.push([change,variant[change]]);
+            if (variant_type === 'html') {
+                for (var change in variant) {
+                   if (change !== 'name' && change !== 'type') this.changes.push([change,variant[change]]);
+                }
+            }
+            else if (variant_type === 'element'){
+                for (var change in variant) {
+                   if (change !== 'name' && change !== 'type') this.element.push([change,variant[change]]);
+                }
+            }
+            else if (variant_type === 'js') {
+                for (var change in variant) {
+                    if (change !== 'name' && change !== 'type') this.js_fns.push([change,variant[change]]);
+                }
             }
         }
     },
@@ -60,9 +76,15 @@ var ABalytics = {
             for (var j=0;j<elements.length;j++) elements[j].innerHTML = change[1];
         }
     },
+    enableJavascript: function() {
+        console.log( this.js_fns );
+        for (var i=0;i<this.js_fns.length;i++) {
+            this.js_fns[i][1]();
+        }
+    },
     enableElement: function() {
-        for (var i=0;i<this.changes.length;i++) {
-            var change = this.changes[i];
+        for (var i=0;i<this.element.length;i++) {
+            var change = this.element[i];
             var elements = document.getElementsByClassName ? document.getElementsByClassName(change[0]) : this.getElementsByClassName(change[0]);
 
             for (var j=0;j<elements.length;j++) elements[j].style.display = change[1];
